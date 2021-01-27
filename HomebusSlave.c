@@ -54,7 +54,7 @@
 #include "TMC5130.h"
 #include "MAX31875.h"
 
-const char VersionString[]="0025V100";  //<! Version information for the TMCL-IDE
+const char VersionString[]="0026V100";  //<! Version information for the TMCL-IDE
 gpio_cfg_t enable_out;            //<! Output for TMC5130 ENABLE pin
 gpio_cfg_t diag0_in;              //<! Input for TMC5130 DIAG0 pin
 gpio_cfg_t diag1_in;              //<! Input for TMC5130 DIAG1 pin

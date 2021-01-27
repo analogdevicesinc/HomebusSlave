@@ -106,8 +106,6 @@
 #define TMC5130_ENCM_CTRL    0x72
 #define TMC5130_LOST_STEPS   0x73
 
-#define WHICH_5130(m)       (m)
-
 //Write bit
 #define TMC5130_WRITE        0x80
 
@@ -200,6 +198,7 @@ void SetTMC5130ChopperRandomTOff(uint8_t Motor, uint8_t RandomTOff);
 void SetTMC5130ChopperDisableFastDecayComp(uint8_t Motor, uint8_t Disable);
 void SetTMC5130ChopperFastDecayTime(uint8_t Motor, uint8_t Time);
 void SetTMC5130ChopperSineWaveOffset(uint8_t Motor, uint8_t Offset);
+void SetTMC5130ChopperVSenseMode(uint8_t Motor, uint8_t Mode);
 uint8_t GetTMC5130ChopperTOff(uint8_t Motor);
 uint8_t GetTMC5130ChopperHysteresisStart(uint8_t Motor);
 uint8_t GetTMC5130ChopperHysteresisEnd(uint8_t Motor);
@@ -214,6 +213,7 @@ uint8_t GetTMC5130ChopperRandomTOff(uint8_t Motor);
 uint8_t GetTMC5130ChopperDisableFastDecayComp(uint8_t Motor);
 uint8_t GetTMC5130ChopperFastDecayTime(uint8_t Motor);
 uint8_t GetTMC5130ChopperSineWaveOffset(uint8_t Motor);
+uint8_t GetTMC5130ChopperVSenseMode(uint8_t Motor);
 void SetTMC5130SmartEnergyUpStep(uint8_t Motor, uint8_t UpStep);
 void SetTMC5130SmartEnergyDownStep(uint8_t Motor, uint8_t DownStep);
 void SetTMC5130SmartEnergyStallLevelMax(uint8_t Motor, uint8_t Max);

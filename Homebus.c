@@ -54,16 +54,16 @@
 #define HBS_TMCL_COMMAND_LENGTH  2*TMCL_COMMAND_LENGTH       //!< Length of a homebus encoder TMCL command
 #define HBS_RX_THRESHOLD         3     //!< Threshold value for Rx FIFO. HBS_TMCL_COMMAND_LENGTH must be dividable by HBS_RX_THRESHOLD.
 
-const sys_cfg_uart_t sys_uart0_cfg = {
+static const sys_cfg_uart_t sys_uart0_cfg = {
         MAP_A,
         UART_FLOW_DISABLE,
 };
 
-gpio_cfg_t HomebusTxPin;  //!< Pin for switching between send and receive mode (MAX22088 RST pin)
-volatile uint8_t HomebusRawRxData[HBS_TMCL_COMMAND_LENGTH];   //!< Buffer for incoming homebus data
-volatile uint8_t HomebusRawTxData[HBS_TMCL_COMMAND_LENGTH];   //!< Buffer for outgoing homebus data
-volatile uint8_t HomebusRawRxCount;                           //!< Counter for incoming homebus data
-volatile uint8_t Command[TMCL_COMMAND_LENGTH];                //!< Buffer for received TMCL command
+static gpio_cfg_t HomebusTxPin;  //!< Pin for switching between send and receive mode (MAX22088 RST pin)
+static uint8_t HomebusRawRxData[HBS_TMCL_COMMAND_LENGTH];   //!< Buffer for incoming homebus data
+static uint8_t HomebusRawTxData[HBS_TMCL_COMMAND_LENGTH];   //!< Buffer for outgoing homebus data
+static volatile uint8_t HomebusRawRxCount;                           //!< Counter for incoming homebus data
+static uint8_t Command[TMCL_COMMAND_LENGTH];                //!< Buffer for received TMCL command
 
 
 /***************************************************************//**

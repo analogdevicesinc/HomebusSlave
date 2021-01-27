@@ -94,7 +94,7 @@ static uint8_t LastTOffSetting[N_O_MOTORS];         //!< Last TOff setting befor
 void WriteTMC5130Datagram(uint8_t Which5130, uint8_t Address, uint8_t x1, uint8_t x2, uint8_t x3, uint8_t x4)
 {
   int Value;
-  spi_req_t SPIRequest;
+  spimss_req_t SPIRequest;
   uint8_t SPITxData[5];
   uint8_t SPIRxData[5];
 
@@ -152,7 +152,7 @@ void WriteTMC5130Datagram(uint8_t Which5130, uint8_t Address, uint8_t x1, uint8_
 ********************************************************************/
 void WriteTMC5130Int(uint8_t Which5130, uint8_t Address, int Value)
 {
-  spi_req_t SPIRequest;
+  spimss_req_t SPIRequest;
   uint8_t SPITxData[5];
   uint8_t SPIRxData[5];
 
@@ -199,7 +199,7 @@ void WriteTMC5130Int(uint8_t Which5130, uint8_t Address, int Value)
 int ReadTMC5130Int(uint8_t Which5130, uint8_t Address)
 {
   int Value;
-  spi_req_t SPIRequest;
+  spimss_req_t SPIRequest;
   uint8_t SPITxData[5];
   uint8_t SPIRxData[5];
 

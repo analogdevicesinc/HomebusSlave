@@ -12,15 +12,15 @@ USE_THUMB_MODE = YES
 
 # MCU name, submodel and board
 # - MCU used for compiler-option (-mcpu)
-# - CHIP used for linker-script name (-T) and passed as define
+# - CHIP used for linker-script name (-T) and passed as define (needed by the Maxim library)
+# - CHIP_NUM and CHIP_REV are needed by the Maxim library (passed as defines)
 MCU      = cortex-m4
 CHIP     = MAX32660
 CHIP_NUM = 32660
 CHIP_REV = 0x4131
 
-#ifeq ($(SUBMDL), MK22FX512)
+#If FPU is to be used:
 #MCU +=  -mfloat-abi=hard -mfpu=fpv4-sp-d16
-#endif
 
 
 # *** This example only supports "ROM_RUN" ***

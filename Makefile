@@ -1,85 +1,9 @@
-# Hey Emacs, this is a -*- makefile -*-
-#
-# WinARM template makefile 
-# by Martin Thomas, Kaiserslautern, Germany 
-# <eversmith(at)heizung-thomas(dot)de>
-#
-# Released to the Public Domain
-# Please read the make user manual!
-#
-# The user-configuration is based on the WinAVR makefile-template
-# written by Eric B. Weddington, Jörg Wunsch, et al. but internal
-# handling used here is very different.
-# This makefile can also be used with the GNU tools included in
-# Yagarto, GNUARM or the codesourcery packages. It should work
-# on Unix/Linux-Systems too. Just a rather up-to-date GNU make is
-# needed.
-#
-#
-# On command line:
-#
-# make all = Make software.
-#
-# make clean = Clean out built project files.
-#
-# make program = Upload load-image to the device
-#
-# make filename.s = Just compile filename.c into the assembler code only
-#
-# make filename.o = Create object filename.o from filename.c (using CFLAGS)
-#
-# To rebuild project do "make clean" then "make all".
-#
-# Changelog:
-# - 17. Feb. 2005  - added thumb-interwork support (mth)
-# - 28. Apr. 2005  - added C++ support (mth)
-# - 29. Arp. 2005  - changed handling for lst-Filename (mth)
-# -  1. Nov. 2005  - exception-vector placement options (mth)
-# - 15. Nov. 2005  - added library-search-path (EXTRA_LIB...) (mth)
-# -  2. Dec. 2005  - fixed ihex and binary file extensions (mth)
-# - 22. Feb. 2006  - added AT91LIBNOWARN setting (mth)
-# - 19. Apr. 2006  - option FLASH_TOOL (mth)
-# - 23. Jun. 2006  - option USE_THUMB_MODE -> THUMB/THUMB_IW
-# -  3. Aug. 2006  - added -ffunction-sections -fdata-sections to CFLAGS
-#                    and --gc-sections to LDFLAGS. Only available for gcc 4 (mth)
-#                    (needs appropriate linker-script, remove them when using a
-#                    "simple" linker-script)
-# -  4. Aug. 2006  - pass SUBMDL-define to frontend (mth)
-# - 11. Nov. 2006  - FLASH_TOOL-config, TCHAIN-config (mth)
-# - 28. Mar. 2007  - remove .dep-Directory with rm -r -f and force "no error" (mth)
-# - 24. Apr. 2007  - added "both" option for format (.bin and .hex) (mth)
-# - 20. Aug. 2007  - extraincdirs in asflags, passing a "board"-define (mth)
-# - 13. Sep. 2007  - create assembler from c-sources fixed (make foo.s for foo.c) (mth)
-#                  - IMGEXT no longer used and removed (mth)
-#                  - moved some entries (mth)
-# - 25. Oct. 2007  - reverted 20070328-change (b/o "race condition" with 
-#                    make clean all or when called from Eclipse) (mth)
-#                  - removed "for flash" from objdump message-string (mth)
-#                  - added same remarks (mth)
-# - 30. Oct. 2007  - Support for an output-directory with all files 
-#                    created during "make all". (mth)
-#                  - modified targets which creates assembler (lower-case s) 
-#                    from C-source using make <.c-file w/o ext.>.s (mth)
-#                  - removed redundant/unused defines, overall cleanup (mth)
-# - 10. Nov. 2007  - renamed TCHAIN to TCHAIN_PREFIX, other minor cleanup (mth)
-# - 13. Mar. 2008  - renamed FORMAT to LOADFORMAT, edited some comments/messages (mth)
-# - 13. Apr. 2009  - OpenOCD options for batch-programming (make program) (mth)
-
-##
-## Special Version to be used with CS G++ lite (cs-make/cs-rm, no other 
-## Shell-Tools needed). Tested with Win XP and CS G++ lite ARM 2008q3-66.
-## M. Thomas 4/2009
-##
-
 # Bootloader
 #BOOT_LOADER=TMCM-BL
 
 # Toolchain prefix (i.e arm-elf- -> arm-elf-gcc.exe)
-#TCHAIN_PREFIX = arm-eabi-
-#TCHAIN_PREFIX = arm-elf-
 TCHAIN_PREFIX = arm-none-eabi-
 REMOVE_CMD=rm
-#REMOVE_CMD=cs-rm
 
 # YES enables -mthumb option to flags for source-files listed 
 # in SRC and CPPSRC and -mthumb-interwork option for all source
@@ -150,7 +74,6 @@ SRC += $(MAXLIBSRCDIR)/mxc_lock.c
 
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).
 # use file-extension c for "c-only"-files
-## just for testing, timer.c could be compiled in thumb-mode too
 SRCARM = 
 
 # List C++ source files here.
@@ -159,7 +82,6 @@ CPPSRC =
 
 # List C++ source files here which must be compiled in ARM-Mode.
 # use file-extension .cpp for C++-files (not .C)
-#CPPSRCARM = $(TARGET).cpp
 CPPSRCARM = 
 
 # List Assembler source files here.
@@ -171,7 +93,7 @@ CPPSRCARM =
 # care about how the name is spelled on its command-line.
 ASRC = $(MAXLIBSRCDIR)/startup_max32660.S
 
-# List Assembler source files here which must be assembled in ARM-Mode..
+# List Assembler source files here which must be assembled in ARM-Mode.
 ASRCARM = 
 
 # List any extra directories to look for include files here.
@@ -197,24 +119,11 @@ LINKERSCRIPTPATH = .
 
 # Optimization level, can be [0, 1, 2, 3, s]. 
 # 0 = turn off optimization. s = optimize for size.
-# (Note: 3 is not always the best optimization level. See avr-libc FAQ.)
+# (Note: 3 is not always the best optimization level.)
 OPT = s
-#OPT = 2
-#OPT = 3
-#OPT = 0
 
 # Output format. (can be ihex or binary or both)
-#  binary to create a load-image in raw-binary format i.e. for SAM-BA, 
-#  ihex to create a load-image in Intel hex format i.e. for lpc21isp
 LOADFORMAT = ihex
-
-
-# Using the Atmel AT91_lib produces warnings with
-# the default warning-levels. 
-#  yes - disable these warnings
-#  no  - keep default settings
-#AT91LIBNOWARN = yes
-AT91LIBNOWARN = no
 
 # Debugging format.
 #DEBUG = stabs
@@ -291,15 +200,6 @@ CFLAGS += -MD -MP -MF $(OUTDIR)/dep/$(@F).d
 CONLYFLAGS += -Wnested-externs 
 CONLYFLAGS += $(CSTANDARD)
 
-ifeq ($(AT91LIBNOWARN),yes)
-# compiling the AT91-lib thows warnings with the followins settings
-# so they are enabled only if AT91LIBNOWARN is set to "no"
-CFLAGS += -Wno-cast-qual
-CONLYFLAGS += -Wno-missing-prototypes 
-CONLYFLAGS += -Wno-strict-prototypes
-CONLYFLAGS += -Wno-missing-declarations
-endif
-
 # flags only for C++ (arm-elf-g++)
 CPPFLAGS = -fno-rtti -fno-exceptions
 CPPFLAGS = 
@@ -341,51 +241,6 @@ LDFLAGS +=-T $(LINKERSCRIPTPATH)/$(CHIP).ld
 endif
 
 
-# ---------------------------------------------------------------------------
-# Options for lpc21isp by Martin Maurer 
-# lpc21isp only supports NXP LPC and Analog ADuC ARMs though the 
-# integrated uart-bootloader (ISP)
-#
-# Settings and variables:
-LPC21ISP = lpc21isp
-LPC21ISP_FLASHFILE = $(OUTDIR)/$(TARGET).hex
-LPC21ISP_PORT = com1
-LPC21ISP_BAUD = 57600
-LPC21ISP_XTAL = 14746
-# other options:
-# -debug: verbose output
-# -control: enter bootloader via RS232 DTR/RTS (only if hardware 
-#           supports this feature - see NXP AppNote)
-#LPC21ISP_OPTIONS = -control
-#LPC21ISP_OPTIONS += -debug
-# ---------------------------------------------------------------------------
-
-
-# ---------------------------------------------------------------------------
-# Options for OpenOCD flash-programming
-# see openocd.pdf/openocd.texi for further information
-#
-OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).elf
-# if OpenOCD is in the $PATH just set OPENOCDEXE=openocd
-OOCD_EXE=OpenOCD/bin/openocd
-# debug level
-OOCD_CL=-d0
-#OOCD_CL=-d3
-# interface and board/target settings (using the OOCD target-library here)
-## OOCD_CL+=-c "fast enable"
-OOCD_CL+=-f interface/jtagkey.cfg -f board/stm32f10x_128k_eval.cfg
-OOCD_CL+=-c init -c targets
-# commands to prepare flash-write
-OOCD_CL+=-c "halt"
-# flash-write and -verify
-OOCD_CL+=-c "flash write_image erase $(OOCD_LOADFILE)" -c "verify_image $(OOCD_LOADFILE)"
-# reset target
-OOCD_CL+=-c "reset run"
-# terminate OOCD after programming
-OOCD_CL+=-c shutdown
-# ---------------------------------------------------------------------------
-
-
 # Define programs and commands.
 SHELL   = sh
 CC      = $(TCHAIN_PREFIX)gcc
@@ -417,7 +272,6 @@ MSG_ASSEMBLING = "**** Assembling:"
 MSG_ASSEMBLING_ARM = "****Assembling (ARM-only):"
 MSG_CLEANING = Cleaning project:
 MSG_FORMATERROR = Can not handle output-format
-MSG_LPC21_RESETREMINDER = You may have to bring the target in bootloader-mode now.
 MSG_ASMFROMC = "Creating asm-File from C-Source:"
 MSG_ASMFROMC_ARM = "Creating asm-File from C-Source (ARM-only):"
 
@@ -486,28 +340,6 @@ sizeafter:
 gccversion : 
 	@$(CC) --version
 #	@echo $(ALLOBJ)
-
-# Program the device.
-ifeq ($(FLASH_TOOL),UVISION)
-# Program the device with Keil's uVision (needs configured uVision-workspace). 
-program: $(OUTDIR)/$(TARGET).hex
-##	@echo
-	@echo "Programming with uVision"
-	C:\Keil\uv3\Uv3.exe -f uvisionflash.Uv2 -ouvisionflash.txt
-else
-ifeq ($(FLASH_TOOL),OPENOCD)
-# Program the device with Dominic Rath's OPENOCD in "batch-mode", needs cfg and "reset-script".
-program: $(OUTDIR)/$(TARGET).elf
-	@echo "Programming with OPENOCD"
-	$(OOCD_EXE) $(OOCD_CL)
-else
-# Program the device using lpc21isp (for NXP2k and ADuC UART bootloader)
-program: $(OUTDIR)/$(TARGET).hex
-##	@echo
-	@echo $(MSG_LPC21_RESETREMINDER)
-	-$(LPC21ISP) $(LPC21ISP_OPTIONS) $(LPC21ISP_FLASHFILE) $(LPC21ISP_PORT) $(LPC21ISP_BAUD) $(LPC21ISP_XTAL)
-endif
-endif
 
 # Create final output file (.hex) from ELF output file.
 %.hex: %.elf
@@ -640,7 +472,7 @@ $(shell mkdir $(OUTDIR) 2>NUL)
 
 # Include the dependency files.
 ##-include $(shell mkdir $(OUTDIR)/dep 2>/dev/null) $(wildcard $(OUTDIR)/dep/*)
--include $(shell mkdir $(OUTDIR)/dep 2>NUL) $(wildcard $(OUTDIR)/dep/*)
+-include $(shell mkdir $(OUTDIR)\dep 2>NUL) $(wildcard $(OUTDIR)/dep/*)
 
 
 # Listing of phony targets.

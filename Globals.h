@@ -49,14 +49,11 @@
 #ifndef __GLOBALS_H
 #define __GLOBALS_H
 
-extern uint8_t SmartEnergy[N_O_MOTORS];
-extern uint32_t StallLevel[N_O_MOTORS];
-extern uint8_t DriverFlags[N_O_MOTORS];
-
 extern uint32_t VMax[N_O_MOTORS];
 extern uint8_t VMaxModified[N_O_MOTORS];
 extern int AMax[N_O_MOTORS];
 extern uint8_t AMaxModified[N_O_MOTORS];
 extern uint8_t StallFlag[N_O_MOTORS];
+extern uint32_t StallVMin[N_O_MOTORS];
 
 #endif

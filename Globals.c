@@ -48,13 +48,9 @@
 #include "max32660.h"
 #include "HomebusSlave.h"
 
-uint8_t SmartEnergy[N_O_MOTORS];
-uint32_t StallLevel[N_O_MOTORS];
-uint8_t DriverFlags[N_O_MOTORS];
-
 uint32_t VMax[N_O_MOTORS];
 uint8_t VMaxModified[N_O_MOTORS];
 int AMax[N_O_MOTORS];
 uint8_t AMaxModified[N_O_MOTORS];
 uint8_t StallFlag[N_O_MOTORS];
-uint8_t DeviationFlag[N_O_MOTORS];
+uint32_t StallVMin[N_O_MOTORS];

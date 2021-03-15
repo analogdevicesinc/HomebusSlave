@@ -552,8 +552,44 @@ void SetAxisParameter(void)
         SetTMC5130ChopperMStepRes(ActualCommand.Motor, 8-ActualCommand.Value.Int32);
         break;
 
+      case 167:
+        SetTMC5130ChopperTOff(ActualCommand.Motor, ActualCommand.Value.Int32);
+        break;
+
+      case 168:
+        SetTMC5130SmartEnergyIMin(ActualCommand.Motor, ActualCommand.Value.Int32);
+        break;
+
+      case 169:
+        SetTMC5130SmartEnergyDownStep(ActualCommand.Motor, ActualCommand.Value.Int32);
+        break;
+
+      case 170:
+        SetTMC5130SmartEnergyStallLevelMax(ActualCommand.Motor, ActualCommand.Value.Int32);
+        break;
+
+      case 171:
+        SetTMC5130SmartEnergyUpStep(ActualCommand.Motor, ActualCommand.Value.Int32);
+        break;
+
+      case 172:
+        SetTMC5130SmartEnergyStallLevelMin(ActualCommand.Motor, ActualCommand.Value.Int32);
+        break;
+
+      case 173:
+        SetTMC5130SmartEnergyFilter(ActualCommand.Motor, ActualCommand.Value.Int32);
+        break;
+
+      case 174:
+        SetTMC5130SmartEnergyStallThreshold(ActualCommand.Motor, ActualCommand.Value.Int32);
+        break;
+
       case 179:
         SetTMC5130ChopperVSenseMode(ActualCommand.Motor, ActualCommand.Value.Byte[0]);
+        break;
+
+      case 181:
+        StallVMin[ActualCommand.Motor]=ConvertVelocityUserToInternal(ActualCommand.Value.Int32);
         break;
 
       case 214:
@@ -734,12 +770,57 @@ void GetAxisParameter(void)
         ActualReply.Value.Int32=8-GetTMC5130ChopperMStepRes(ActualCommand.Motor);
         break;
 
+      case 167:
+        ActualReply.Value.Int32=GetTMC5130ChopperTOff(ActualCommand.Motor);
+        break;
+
+      case 168:
+        ActualReply.Value.Int32=GetTMC5130SmartEnergyIMin(ActualCommand.Motor);
+        break;
+
+      case 169:
+        ActualReply.Value.Int32=GetTMC5130SmartEnergyDownStep(ActualCommand.Motor);
+        break;
+
+      case 170:
+        ActualReply.Value.Int32=GetTMC5130SmartEnergyStallLevelMax(ActualCommand.Motor);
+        break;
+
+      case 171:
+        ActualReply.Value.Int32=GetTMC5130SmartEnergyUpStep(ActualCommand.Motor);
+        break;
+
+      case 172:
+        ActualReply.Value.Int32=GetTMC5130SmartEnergyStallLevelMin(ActualCommand.Motor);
+        break;
+
+      case 173:
+        ActualReply.Value.Int32=GetTMC5130SmartEnergyFilter(ActualCommand.Motor);
+        break;
+
+      case 174:
+        ActualReply.Value.Int32=GetTMC5130SmartEnergyStallThreshold(ActualCommand.Motor);
+        break;
+
       case 179:
         ActualReply.Value.Int32=GetTMC5130ChopperVSenseMode(ActualCommand.Motor);
         break;
 
+      case 180:
+        ActualReply.Value.Int32=(ReadTMC5130Int(ActualCommand.Motor, TMC5130_DRVSTATUS) >> 16) & 0x1f;
+        break;
+
+      case 181:
+        ActualReply.Value.Int32=ConvertVelocityInternalToUser(StallVMin[ActualCommand.Motor]);
+        break;
+
       case 206:
         ActualReply.Value.Int32=ReadTMC5130Int(WHICH_5130(ActualCommand.Motor), TMC5130_DRVSTATUS) & 0x3ff;
+        break;
+
+      case 207:
+        ActualReply.Value.Int32=StallFlag[ActualCommand.Motor];
+        StallFlag[ActualCommand.Motor]=FALSE;
         break;
 
       case 208:

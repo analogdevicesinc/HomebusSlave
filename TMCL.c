@@ -54,6 +54,7 @@
 #include "TMCL.h"
 #include "MAX31875.h"
 #include "Homebus.h"
+#include "RefSearch.h"
 
 #define RS485_MODULE_ADDRESS 1
 #define RS485_HOST_ADDRESS   2
@@ -75,6 +76,7 @@ static void SetAxisParameter(void);
 static void GetAxisParameter(void);
 static void GetInput(void);
 static void GetVersion(void);
+static void ReferenceSearch(void);
 
 
 void InitTMCL(void)
@@ -87,6 +89,10 @@ void InitTMCL(void)
     VMaxModified[i]=FALSE;
     AMax[i]=ReadTMC5130Int(WHICH_5130(i), TMC5130_AMAX);
     AMaxModified[i]=FALSE;
+
+    RefSearchVelocity[i]=100000;
+    RefSearchStallVMin[i]=98000;
+    RefSearchStallThreshold[i]=0;
   }
 }
 
@@ -134,6 +140,10 @@ static void ExecuteActualCommand(void)
 
     case TMCL_GIO:
       GetInput();
+      break;
+
+    case TMCL_RFS:
+      ReferenceSearch();
       break;
 
     case TMCL_GetVersion:
@@ -265,6 +275,7 @@ static void RotateLeft(void)
       AMaxModified[ActualCommand.Motor]=FALSE;
     }
     VMaxModified[ActualCommand.Motor]=TRUE;
+    StallFlag[ActualCommand.Motor]=FALSE;
     WriteTMC5130Int(WHICH_5130(ActualCommand.Motor), TMC5130_VMAX, ConvertVelocityUserToInternal(abs(ActualCommand.Value.Int32)));
     if(ActualCommand.Value.Int32>0)
       WriteTMC5130Datagram(WHICH_5130(ActualCommand.Motor), TMC5130_RAMPMODE, 0, 0, 0, TMC5130_MODE_VELNEG);
@@ -291,6 +302,7 @@ static void RotateRight(void)
       AMaxModified[ActualCommand.Motor]=FALSE;
     }
     VMaxModified[ActualCommand.Motor]=TRUE;
+    StallFlag[ActualCommand.Motor]=FALSE;
     WriteTMC5130Int(WHICH_5130(ActualCommand.Motor), TMC5130_VMAX, ConvertVelocityUserToInternal(abs(ActualCommand.Value.Int32)));
     if(ActualCommand.Value.Int32>0)
       WriteTMC5130Datagram(WHICH_5130(ActualCommand.Motor), TMC5130_RAMPMODE, 0, 0, 0, TMC5130_MODE_VELPOS);
@@ -312,6 +324,7 @@ static void MotorStop(void)
   if(ActualCommand.Motor<N_O_MOTORS)
   {
     VMaxModified[ActualCommand.Motor]=TRUE;
+    StallFlag[ActualCommand.Motor]=FALSE;
     WriteTMC5130Int(WHICH_5130(ActualCommand.Motor), TMC5130_VMAX, 0);
     WriteTMC5130Datagram(WHICH_5130(ActualCommand.Motor), TMC5130_RAMPMODE, 0, 0, 0, TMC5130_MODE_VELNEG);
   }
@@ -344,6 +357,7 @@ static void MoveToPosition(void)
           WriteTMC5130Int(WHICH_5130(ActualCommand.Motor), TMC5130_AMAX, AMax[ActualCommand.Motor]);
           AMaxModified[ActualCommand.Motor]=FALSE;
         }
+        StallFlag[ActualCommand.Motor]=FALSE;
         WriteTMC5130Int(WHICH_5130(ActualCommand.Motor), TMC5130_XTARGET, ActualCommand.Value.Int32);
         WriteTMC5130Datagram(WHICH_5130(ActualCommand.Motor), TMC5130_RAMPMODE, 0, 0, 0, TMC5130_MODE_POSITION);
         break;
@@ -359,6 +373,7 @@ static void MoveToPosition(void)
           WriteTMC5130Int(WHICH_5130(ActualCommand.Motor), TMC5130_AMAX, AMax[ActualCommand.Motor]);
           AMaxModified[ActualCommand.Motor]=FALSE;
         }
+        StallFlag[ActualCommand.Motor]=FALSE;
         NewPosition=ReadTMC5130Int(WHICH_5130(ActualCommand.Motor), TMC5130_XTARGET)+ActualCommand.Value.Int32;
         WriteTMC5130Int(WHICH_5130(ActualCommand.Motor), TMC5130_XTARGET, NewPosition);
         WriteTMC5130Datagram(WHICH_5130(ActualCommand.Motor), TMC5130_RAMPMODE, 0, 0, 0, TMC5130_MODE_POSITION);
@@ -592,6 +607,29 @@ void SetAxisParameter(void)
         StallVMin[ActualCommand.Motor]=ConvertVelocityUserToInternal(ActualCommand.Value.Int32);
         break;
 
+      case 182:
+        if(ActualCommand.Value.Int32>=0)
+        {
+          if(ActualCommand.Value.Int32>0)
+            WriteTMC5130Int(WHICH_5130(ActualCommand.Motor), TMC5130_TCOOLTHRS, 12500000 / ActualCommand.Value.Int32);
+          else
+            WriteTMC5130Int(WHICH_5130(ActualCommand.Motor), TMC5130_TCOOLTHRS, 1048757);
+        }
+        else ActualReply.Status=REPLY_INVALID_VALUE;
+        break;
+
+      case 193:
+        RefSearchStallThreshold[ActualCommand.Motor]=ActualCommand.Value.Int32;
+        break;
+
+      case 194:
+        RefSearchVelocity[ActualCommand.Motor]=ActualCommand.Value.Int32;
+        break;
+
+      case 195:
+        RefSearchStallVMin[ActualCommand.Motor]=ActualCommand.Value.Int32;
+        break;
+
       case 214:
         WriteTMC5130Int(WHICH_5130(ActualCommand.Motor), TMC5130_TPOWERDOWN, (int) floor((double) ActualCommand.Value.Int32/TPOWERDOWN_FACTOR));
         break;
@@ -814,13 +852,32 @@ void GetAxisParameter(void)
         ActualReply.Value.Int32=ConvertVelocityInternalToUser(StallVMin[ActualCommand.Motor]);
         break;
 
+      case 182:
+        Value=ReadTMC5130Int(WHICH_5130(ActualCommand.Motor), TMC5130_TCOOLTHRS);
+        if(Value>0)
+          ActualReply.Value.Int32=12500000/Value;
+         else
+          ActualReply.Value.Int32=16777215;
+        break;
+
+      case 193:
+        ActualReply.Value.Int32=RefSearchStallThreshold[ActualCommand.Motor];
+        break;
+
+      case 194:
+        ActualReply.Value.Int32=RefSearchVelocity[ActualCommand.Motor];
+        break;
+
+      case 195:
+        ActualReply.Value.Int32=RefSearchStallVMin[ActualCommand.Motor];
+        break;
+
       case 206:
         ActualReply.Value.Int32=ReadTMC5130Int(WHICH_5130(ActualCommand.Motor), TMC5130_DRVSTATUS) & 0x3ff;
         break;
 
       case 207:
         ActualReply.Value.Int32=StallFlag[ActualCommand.Motor];
-        StallFlag[ActualCommand.Motor]=FALSE;
         break;
 
       case 208:
@@ -870,6 +927,39 @@ static void GetInput(void)
       ActualReply.Status=REPLY_INVALID_VALUE;
       break;
   }
+}
+
+
+/***************************************************************//**
+   \fn ReferenceSearch()
+   \brief TMCL RFS command
+
+   Execute TMCL RFS command.
+********************************************************************/
+static void ReferenceSearch(void)
+{
+  if(ActualCommand.Motor<N_O_MOTORS)
+  {
+    switch(ActualCommand.Type)
+    {
+      case RFS_START:
+        StartRefSearch(ActualCommand.Motor);
+        break;
+
+      case RFS_STOP:
+        StopRefSearch(ActualCommand.Motor);
+        break;
+
+      case RFS_STATUS:
+        ActualReply.Value.Int32=GetRefSearchState(ActualCommand.Motor);
+        break;
+
+      default:
+        ActualReply.Status=REPLY_WRONG_TYPE;
+        break;
+    }
+  }
+  else ActualReply.Status=REPLY_INVALID_VALUE;
 }
 
 

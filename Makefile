@@ -56,7 +56,7 @@ INCLUDE_DIRS = -I$(MAXLIBDIR)
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
 ## Our Application:
-SRC = HomebusSlave.c SysTick.c TMC5130.c Globals.c Homebus.c TMCL.c MAX31875.c
+SRC = HomebusSlave.c SysTick.c TMC5130.c Globals.c Homebus.c TMCL.c RefSearch.c MAX31875.c
 
 
 ## used parts of the Maxim library

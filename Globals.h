@@ -55,5 +55,8 @@ extern int AMax[N_O_MOTORS];
 extern uint8_t AMaxModified[N_O_MOTORS];
 extern uint8_t StallFlag[N_O_MOTORS];
 extern uint32_t StallVMin[N_O_MOTORS];
+extern int32_t RefSearchStallThreshold[N_O_MOTORS];
+extern int32_t RefSearchVelocity[N_O_MOTORS];
+extern uint32_t RefSearchStallVMin[N_O_MOTORS];
 
 #endif

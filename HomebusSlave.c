@@ -54,6 +54,8 @@
 #include "SysTick.h"
 #include "TMC5130.h"
 #include "MAX31875.h"
+#include "RefSearch.h"
+#include "TMCL.h"
 
 const char VersionString[]="0026V100";  //<! Version information for the TMCL-IDE
 gpio_cfg_t led_out;               //<! Output for LED
@@ -165,6 +167,8 @@ void ProcessStallGuard(void)
     WriteTMC5130Int(WHICH_5130(ActualAxis), TMC5130_RAMPSTAT, TMC5130_RS_EV_POSREACHED);
   if(RampStat & TMC5130_RS_EV_STOP_SG)
     WriteTMC5130Int(WHICH_5130(ActualAxis), TMC5130_RAMPSTAT, TMC5130_RS_EV_STOP_SG);
+
+  ProcessRefSearch(ActualAxis);
 
   //Next axis
   ActualAxis++;

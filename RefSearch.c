@@ -56,6 +56,8 @@ typedef enum {RFS_IDLE, RFS_START, RFS_WAIT} TRefSearchState;
 static TRefSearchState RefSearchState[N_O_MOTORS];
 static uint32_t NormalStallVMin[N_O_MOTORS];
 static int32_t NormalStallThreshold[N_O_MOTORS];
+static uint32_t NormalGConfSetting[N_O_MOTORS];
+static uint32_t NormalTCoolthrs[N_O_MOTORS];
 
 void ProcessRefSearch(uint8_t axis)
 {
@@ -75,9 +77,13 @@ void ProcessRefSearch(uint8_t axis)
       NormalStallVMin[axis]=StallVMin[axis];
       StallVMin[axis]=RefSearchStallVMin[axis];
       NormalStallThreshold[axis]=GetTMC5130SmartEnergyStallThreshold(axis);
+      NormalGConfSetting[axis]=ReadTMC5130Int(WHICH_5130(axis), TMC5130_GCONF);
+      WriteTMC5130Int(WHICH_5130(axis), TMC5130_GCONF, NormalGConfSetting[axis] & ~TMC5130_GCONF_EN_PWM_MODE);  //Switch off StealthChop during reference search
+      NormalTCoolthrs[axis]=ReadTMC5130Int(WHICH_5130(axis), TMC5130_TCOOLTHRS);
+      WriteTMC5130Int(WHICH_5130(axis), TMC5130_TCOOLTHRS, 1048757);
       SetTMC5130SmartEnergyStallThreshold(axis, RefSearchStallThreshold[axis]);
       WriteTMC5130Int(WHICH_5130(axis), TMC5130_VMAX, ConvertVelocityUserToInternal(abs(RefSearchVelocity[axis])));
-      if(RefSearchVelocity[axis]>0)
+      if(RefSearchVelocity[axis]<0)  //Reference search: use opposite direction than elsewhere
         WriteTMC5130Datagram(WHICH_5130(axis), TMC5130_RAMPMODE, 0, 0, 0, TMC5130_MODE_VELPOS);
       else
         WriteTMC5130Datagram(WHICH_5130(axis), TMC5130_RAMPMODE, 0, 0, 0, TMC5130_MODE_VELNEG);
@@ -89,6 +95,10 @@ void ProcessRefSearch(uint8_t axis)
       if(StallFlag[axis])
       {
         StallVMin[axis]=NormalStallVMin[axis];
+        WriteTMC5130Int(WHICH_5130(axis), TMC5130_GCONF, NormalGConfSetting[axis]);
+        WriteTMC5130Int(WHICH_5130(axis), TMC5130_TCOOLTHRS, NormalTCoolthrs[axis]);
+        WriteTMC5130Int(WHICH_5130(axis), TMC5130_XTARGET, 0);
+        WriteTMC5130Int(WHICH_5130(axis), TMC5130_XACTUAL, 0);
         RefSearchState[axis]=RFS_IDLE;
       }
       break;

@@ -47,6 +47,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "max32660.h"
+#include "bits.h"
 #include "HomebusSlave.h"
 #include "Globals.h"
 #include "SysTick.h"
@@ -92,7 +93,7 @@ void InitTMCL(void)
 
     RefSearchVelocity[i]=100000;
     RefSearchStallVMin[i]=98000;
-    RefSearchStallThreshold[i]=0;
+    RefSearchStallThreshold[i]=3;  //bigger drive: 5
   }
 }
 
@@ -618,6 +619,38 @@ void SetAxisParameter(void)
         else ActualReply.Status=REPLY_INVALID_VALUE;
         break;
 
+      case 186:
+        if(ActualCommand.Value.Int32>=0)
+        {
+          if(ActualCommand.Value.Int32>0)
+            WriteTMC5130Int(WHICH_5130(ActualCommand.Motor), TMC5130_TPWMTHRS, 12500000 / ActualCommand.Value.Int32);
+          else
+            WriteTMC5130Int(WHICH_5130(ActualCommand.Motor), TMC5130_TPWMTHRS, 1048757);
+        }
+        else ActualReply.Status=REPLY_INVALID_VALUE;
+        break;
+
+      case 187:
+        SetTMC5130PWMGrad(ActualCommand.Motor, ActualCommand.Value.Int32);
+        Value=ReadTMC5130Int(WHICH_5130(ActualCommand.Motor), TMC5130_GCONF);
+        if(ActualCommand.Value.Int32!=0)  //PWMGrad=0 => completely switch off StealthChop
+          WriteTMC5130Int(WHICH_5130(ActualCommand.Motor), TMC5130_GCONF, Value|TMC5130_GCONF_EN_PWM_MODE);
+        else
+          WriteTMC5130Int(WHICH_5130(ActualCommand.Motor), TMC5130_GCONF, Value& ~TMC5130_GCONF_EN_PWM_MODE);
+        break;
+
+      case 188:
+        SetTMC5130PWMAmpl(ActualCommand.Motor, ActualCommand.Value.Int32);
+        break;
+
+      case 191:
+        SetTMC5130PWMFrequency(ActualCommand.Motor, ActualCommand.Value.Int32);
+        break;
+
+      case 192:
+        SetTMC5130PWMAutoscale(ActualCommand.Motor, ActualCommand.Value.Int32);
+        break;
+
       case 193:
         RefSearchStallThreshold[ActualCommand.Motor]=ActualCommand.Value.Int32;
         break;
@@ -858,6 +891,34 @@ void GetAxisParameter(void)
           ActualReply.Value.Int32=12500000/Value;
          else
           ActualReply.Value.Int32=16777215;
+        break;
+
+      case 186:
+        Value=ReadTMC5130Int(WHICH_5130(ActualCommand.Motor), TMC5130_TPWMTHRS);
+        if(Value>0)
+          ActualReply.Value.Int32=12500000/Value;
+         else
+          ActualReply.Value.Int32=16777215;
+        break;
+
+      case 187:
+        ActualReply.Value.Int32=GetTMC5130PWMGrad(ActualCommand.Motor);
+        break;
+
+      case 188:
+        ActualReply.Value.Int32=GetTMC5130PWMAmpl(ActualCommand.Motor);
+        break;
+
+      case 189:
+        ActualReply.Value.Int32=ReadTMC5130Int(ActualCommand.Motor, TMC5130_PWMSCALE);
+        break;
+
+      case 191:
+        ActualReply.Value.Int32=GetTMC5130PWMFrequency(ActualCommand.Motor);
+        break;
+
+      case 192:
+        ActualReply.Value.Int32=GetTMC5130PWMAutoscale(ActualCommand.Motor);
         break;
 
       case 193:

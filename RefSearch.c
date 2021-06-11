@@ -51,7 +51,7 @@
 #include "Globals.h"
 #include "TMC5130.h"
 
-typedef enum {RFS_IDLE, RFS_START, RFS_WAIT} TRefSearchState;
+typedef enum {RFS_IDLE, RFS_START, RFS_WAITMAX, RFS_WAITMIN} TRefSearchState;
 
 static TRefSearchState RefSearchState[N_O_MOTORS];
 static uint32_t NormalStallVMin[N_O_MOTORS];
@@ -83,17 +83,43 @@ void ProcessRefSearch(uint8_t axis)
       WriteTMC5130Int(WHICH_5130(axis), TMC5130_TCOOLTHRS, 1048757);
       SetTMC5130SmartEnergyStallThreshold(axis, RefSearchStallThreshold[axis]);
       WriteTMC5130Int(WHICH_5130(axis), TMC5130_VMAX, ConvertVelocityUserToInternal(abs(RefSearchVelocity[axis])));
-      if(RefSearchVelocity[axis]<0)  //Reference search: use opposite direction than elsewhere
+      if(RefSearchVelocity[axis]>0)
         WriteTMC5130Datagram(WHICH_5130(axis), TMC5130_RAMPMODE, 0, 0, 0, TMC5130_MODE_VELPOS);
       else
         WriteTMC5130Datagram(WHICH_5130(axis), TMC5130_RAMPMODE, 0, 0, 0, TMC5130_MODE_VELNEG);
 
-      RefSearchState[axis]=RFS_WAIT;
+      RefSearchState[axis]=RFS_WAITMAX;
       break;
 
-    case RFS_WAIT:
+    case RFS_WAITMAX:
       if(StallFlag[axis])
       {
+        WriteTMC5130Int(WHICH_5130(axis), TMC5130_XTARGET, 0);
+        WriteTMC5130Int(WHICH_5130(axis), TMC5130_XACTUAL, 0);
+
+        if(AMaxModified[axis])
+        {
+          WriteTMC5130Int(WHICH_5130(axis), TMC5130_AMAX, AMax[axis]);
+          AMaxModified[axis]=FALSE;
+        }
+        VMaxModified[axis]=TRUE;
+        StallFlag[axis]=FALSE;
+
+        WriteTMC5130Int(WHICH_5130(axis), TMC5130_VMAX, ConvertVelocityUserToInternal(abs(RefSearchVelocity[axis])));
+        if(RefSearchVelocity[axis]<0)  //Use opposite direction now
+          WriteTMC5130Datagram(WHICH_5130(axis), TMC5130_RAMPMODE, 0, 0, 0, TMC5130_MODE_VELPOS);
+        else
+          WriteTMC5130Datagram(WHICH_5130(axis), TMC5130_RAMPMODE, 0, 0, 0, TMC5130_MODE_VELNEG);
+
+        RefSearchState[axis]=RFS_WAITMIN;
+      }
+      break;
+
+    case RFS_WAITMIN:
+      if(StallFlag[axis])
+      {
+        RefSearchDistance[axis]=abs(ReadTMC5130Int(WHICH_5130(axis), TMC5130_XACTUAL));
+
         StallVMin[axis]=NormalStallVMin[axis];
         WriteTMC5130Int(WHICH_5130(axis), TMC5130_GCONF, NormalGConfSetting[axis]);
         WriteTMC5130Int(WHICH_5130(axis), TMC5130_TCOOLTHRS, NormalTCoolthrs[axis]);

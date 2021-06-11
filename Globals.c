@@ -57,3 +57,4 @@ uint32_t StallVMin[N_O_MOTORS];
 int32_t RefSearchVelocity[N_O_MOTORS];
 int32_t RefSearchStallThreshold[N_O_MOTORS];
 uint32_t RefSearchStallVMin[N_O_MOTORS];
+int RefSearchDistance[N_O_MOTORS];

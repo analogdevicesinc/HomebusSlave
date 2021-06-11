@@ -93,7 +93,7 @@ void InitTMCL(void)
 
     RefSearchVelocity[i]=100000;
     RefSearchStallVMin[i]=98000;
-    RefSearchStallThreshold[i]=3;  //bigger drive: 5
+    RefSearchStallThreshold[i]=5;  //smaller drive: 3
   }
 }
 
@@ -931,6 +931,10 @@ void GetAxisParameter(void)
 
       case 195:
         ActualReply.Value.Int32=RefSearchStallVMin[ActualCommand.Motor];
+        break;
+
+      case 196:
+        ActualReply.Value.Int32=RefSearchDistance[ActualCommand.Motor];
         break;
 
       case 206:

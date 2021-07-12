@@ -47,6 +47,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "max32660.h"
+#include "gpio.h"
 #include "bits.h"
 #include "HomebusSlave.h"
 #include "Globals.h"
@@ -61,13 +62,13 @@
 #define RS485_HOST_ADDRESS   2
 
 extern const char VersionString[];
+extern gpio_cfg_t enable_out;            //<! Output for TMC5130 ENABLE pin
 
 static uint8_t TMCLCommandState;              //!< State of the interpreter
 static TTMCLCommand ActualCommand;            //!< TMCL command to be executed (with all parameters)
 static TTMCLReply ActualReply;                //!< Reply of last executed TMCL command
 static uint8_t TMCLReplyFormat;               //!< format of next reply (RF_NORMAL or RF_SPECIAL)
 static uint8_t SpecialReply[9];               //!< buffer for special replies
-static uint8_t ResetRequested;                //!< TRUE after executing the software reset command
 
 static void RotateLeft(void);
 static void RotateRight(void);
@@ -226,9 +227,6 @@ void ProcessCommand(void)
   //Reset state (answer has been sent now)
   TMCLCommandState=TCS_IDLE;
   TMCLReplyFormat=RF_STANDARD;
-
-  //Generate a system reset if requested by the host
-  //if(ResetRequested) ResetCPU(TRUE);
 
   //**Try to get a new command**
   if(HomebusGetData(RS485Cmd))  //Get data from UART
@@ -675,7 +673,14 @@ void SetAxisParameter(void)
           WriteTMC5130Int(WHICH_5130(ActualCommand.Motor), TMC5130_GCONF, Value & ~TMC5130_GCONF_SHAFT);
         break;
 
-       default:
+      case 255:
+        if(ActualCommand.Value.Int32!=0)
+          GPIO_OutClr(&enable_out);
+        else
+          GPIO_OutSet(&enable_out);
+        break;
+
+      default:
         ActualReply.Status=REPLY_WRONG_TYPE;
     }
   } else ActualReply.Status=REPLY_INVALID_VALUE;
@@ -955,6 +960,10 @@ void GetAxisParameter(void)
 
       case 251:
         ActualReply.Value.Int32=(ReadTMC5130Int(WHICH_5130(ActualCommand.Motor), TMC5130_GCONF) & TMC5130_GCONF_SHAFT) ? 1:0;
+        break;
+
+      case 255:
+        ActualReply.Value.Int32=GPIO_OutGet(&enable_out) ? 0:1;
         break;
 
       default:

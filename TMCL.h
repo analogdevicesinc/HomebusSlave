@@ -1,3 +1,11 @@
+/*******************************************************************************
+* Copyright © 2021 TRINAMIC Motion Control GmbH & Co. KG
+* (now owned by Analog Devices Inc.),
+*
+* Copyright © 2023 Analog Devices Inc. All Rights Reserved. This software is
+* proprietary & confidential to Analog Devices, Inc. and its licensors.
+*******************************************************************************/
+
 /** \file TMCL.h ***********************************************************
  *
  *             Project: Homebus Reference Design
@@ -9,42 +17,6 @@
  *                    2021_01_26    Rev 1.00    Olav Kahlbaum   File created
  *
  *  -------------------------------------------------------------------- */
-
-/*******************************************************************************
-* Copyright (C) Maxim Integrated Products, Inc., All rights Reserved.
-*
-* This software is protected by copyright laws of the United States and
-* of foreign countries. This material may also be protected by patent laws
-* and technology transfer regulations of the United States and of foreign
-* countries. This software is furnished under a license agreement and/or a
-* nondisclosure agreement and may only be used or reproduced in accordance
-* with the terms of those agreements. Dissemination of this information to
-* any party or parties not specified in the license agreement and/or
-* nondisclosure agreement is expressly prohibited.
-*
-* The above copyright notice and this permission notice shall be included
-* in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-* OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-* MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-* IN NO EVENT SHALL MAXIM INTEGRATED BE LIABLE FOR ANY CLAIM, DAMAGES
-* OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-* ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-* OTHER DEALINGS IN THE SOFTWARE.
-*
-* Except as contained in this notice, the name of Maxim Integrated
-* Products, Inc. shall not be used except as stated in the Maxim Integrated
-* Products, Inc. Branding Policy.
-*
-* The mere transfer of this software does not imply any licenses
-* of trade secrets, proprietary technology, copyrights, patents,
-* trademarks, maskwork rights, or any other form of intellectual
-* property whatsoever. Maxim Integrated Products, Inc. retains all
-* ownership rights.
-*******************************************************************************
-*/
-
 
 //States of the command interpreter
 #define TM_IDLE 0              //!< idle mode (no stand-alone program running)
@@ -165,7 +137,7 @@
 #define MVP_REL   1            //!< relative movement (with MVP command)
 #define MVP_COORD 2            //!< coordinate movement (with MVO command)
 
-//Optionen f�r relative Positionierung
+//Optionen für relative Positionierung
 #define RMO_TARGET 0    //letzte Zielposition
 #define RMO_ACTINT 1    //aktuelle Rampengeneratorposition
 #define RMO_ACTENC 2    //aktuelle Encoderposition
@@ -258,7 +230,7 @@
   #define TMCL_MEM_SIZE 2048
   #define TMCL_STACK_DEPTH 8
   #define TMCL_RAM_USER_VARS 256     //Es gibt 256 User-Variablen (mehr als 256 geht nicht)...
-  #define TMCL_EEPROM_USER_VARS 56   //...von denen die ersten 56 auch im EEPROM gespeichert werden k�nnen.
+  #define TMCL_EEPROM_USER_VARS 56   //...von denen die ersten 56 auch im EEPROM gespeichert werden können.
   #define TMCL_COORDINATES 21
   #define TMCL_BREAKPOINTS 10
 #else

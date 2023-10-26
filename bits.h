@@ -1,3 +1,11 @@
+/*******************************************************************************
+* Copyright © 2021 TRINAMIC Motion Control GmbH & Co. KG
+* (now owned by Analog Devices Inc.),
+*
+* Copyright © 2023 Analog Devices Inc. All Rights Reserved. This software is
+* proprietary & confidential to Analog Devices, Inc. and its licensors.
+*******************************************************************************/
+
 #define   BIT0        0x00000001
 #define   BIT1        0x00000002
 #define   BIT2        0x00000004
